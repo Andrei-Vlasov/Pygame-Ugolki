@@ -1,17 +1,15 @@
 import pygame
-
+import datetime
 
 white = (255, 255, 255)
 black = (0, 0, 0)
 
-WIN_WIDTH = 800
+WIN_WIDTH = 1200
 WIN_HEIGHT = 800
 FPS = 60
 
 pygame.init()
 pygame.mixer.init()
-clock = pygame.time.Clock()
-
 
 w = pygame.image.load('media/w.png')
 b = pygame.image.load('media/b.png')
@@ -96,6 +94,10 @@ class Game:
         self.base = None
         self.visited = []
         print('Turn # 1 by player white')
+
+        self._start_time = pygame.time.get_ticks()
+        self.clock = datetime.timedelta(seconds=(pygame.time.get_ticks() - self._start_time) / 1000)
+
         self.game_loop()
 
     def next_turn(self):
@@ -239,5 +241,22 @@ class Game:
                                         self.move.remove(self.move[1])
             self.tile_list.update()
             pygame.display.update()
+            self.widget()
+
+    def widget(self):
+        first = 'Time: ' + str(datetime.timedelta(seconds=(pygame.time.get_ticks() - self._start_time) / 1000))[:7]
+        second = 'Player: ' + {1: 'White', -1: 'Black'}[self.team]
+        third = 'Turn: ' + str(self.turn)
+
+        font = pygame.font.Font(pygame.font.get_default_font(), 30)
+        widget_surface = pygame.Surface((0, 0))
+        widget_surface.fill(black)
+        i = 0
+        for el in [first, second, third]:
+            widget = font.render(el, True, white, black)
+            widgetRect = widget.get_rect()
+            widgetRect.center = (1000, 50*(1+i))  #
+            screen.blit(widget, widgetRect)
+            i+=1
 
 Game()
