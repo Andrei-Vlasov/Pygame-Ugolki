@@ -3,6 +3,7 @@ import datetime
 
 white = (255, 255, 255)
 black = (0, 0, 0)
+grey = (127, 127, 127)
 
 WIN_WIDTH = 1200
 WIN_HEIGHT = 800
@@ -10,30 +11,33 @@ FPS = 60
 
 pygame.init()
 pygame.mixer.init()
-
+# MEDIA
+# tiles
 w = pygame.image.load('media/w.png')
 b = pygame.image.load('media/b.png')
 wob = pygame.image.load('media/wob.png')
 bob = pygame.image.load('media/bob.png')
 wow = pygame.image.load('media/wow.png')
 bow = pygame.image.load('media/bow.png')
-
+# buttons
 bu1 = pygame.image.load('media/button1.png')
 bu2 = pygame.image.load('media/button2.png')
 bu3 = pygame.image.load('media/button3.png')
 bu4 = pygame.image.load('media/button4.png')
 
 sound = pygame.mixer.Sound('media/knock.wav')
-
+font = pygame.font.Font('consola.ttf', 30)
 
 screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
+screen.fill(grey)
 pygame.display.set_caption("Corners")
 icon = pygame.image.load('media/checker-board.png')
 pygame.display.set_icon(icon)
 
 
+# 1 = white, -1 = black
 class Tile(pygame.sprite.Sprite):
-    def __init__(self, clr, x, y):
+    def __init__(self, clr, x, y):  # initialises with piece
         super().__init__()
 
         self.clr = clr
@@ -53,7 +57,7 @@ class Tile(pygame.sprite.Sprite):
 
         self.draw()
 
-    def draw(self):
+    def draw(self):  # png pictures
         if self.clr == 1:
             if self.piece == 0:
                 self.image = w
@@ -73,9 +77,38 @@ class Tile(pygame.sprite.Sprite):
         screen.blit(self.image, (self.rect.x, self.rect.y))
 
 
+class Button(pygame.sprite.Sprite):
+    global screen_width, screen_height, screen
+
+    def __init__(self, x, y, width, height, text_color, background_color, text):
+        super().__init__()
+
+        self.rect = pygame.Rect(x, y, width, height)
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.text = text
+        self.text_color = text_color
+        self.background_color = background_color
+
+    @staticmethod
+    def drawTextcenter(text, font, screen, x, y, color):
+        textobj = font.render(text, True, color)
+        textrect = textobj.get_rect(center=(int(x), int(y)))
+        screen.blit(textobj, textrect)
+
+    def draw(self):
+        pygame.draw.rect(screen, self.background_color, (self.rect), 0)
+        self.drawTextcenter(self.text, font, screen, self.x + self.width / 2, self.y + self.height / 2, self.text_color)
+        pygame.draw.rect(screen, self.text_color, self.rect, 3)
+
+
+
 class Game:
     def __init__(self):
         self.tile_list = pygame.sprite.Group()
+        self.menu = pygame.sprite.Group()
 
         cl = 1
         for row in range(8):
@@ -86,19 +119,44 @@ class Game:
                 self.tile_list.add(tile)
         self.tile_list.draw(screen)
 
+        b1 = Button(850, 200, 300, 50, black, white, 'New Game')
+        b2 = Button(850, 275, 300, 50, black, white, 'Rules')
+        b3 = Button(850, 350, 300, 50, black, white, 'Demo')
+        b4 = Button(850, 425, 300, 50, black, white, 'About')
+
+        for btn in [b1, b2, b3, b4]:
+            btn.draw()
+            self.menu.add(btn)
+
         self.running = True
         self.team = 1
         self.turn = 1
 
+        self.move = []  # from ... to ...
+        self.base = None  # second move must start with same piece
+        self.visited = []  # no walking in circles
+        print('Turn # 1 by player white')
+
+        self._start_time = pygame.time.get_ticks()  # for timer widget
+        self.game_loop()
+
+    def reset_board(self):
+        self.tile_list = pygame.sprite.Group()
+        cl = 1
+        for row in range(8):
+            cl *= -1
+            for column in range(8):
+                tile = Tile(cl, column + 1, row + 1)
+                cl *= -1
+                self.tile_list.add(tile)
+        self.tile_list.draw(screen)
+        self.running = True
+        self.team = 1
+        self.turn = 1
         self.move = []
         self.base = None
         self.visited = []
-        print('Turn # 1 by player white')
-
         self._start_time = pygame.time.get_ticks()
-        self.clock = datetime.timedelta(seconds=(pygame.time.get_ticks() - self._start_time) / 1000)
-
-        self.game_loop()
 
     def next_turn(self):
         self.base = None
@@ -112,7 +170,7 @@ class Game:
         else:
             print('black')
 
-    def run_demo(self):
+    def run_demo(self):  # play out scripted game
         pair = [None, None]
         with open('logs/demo.txt') as log:
             for line in log.readlines()[1:]:
@@ -137,7 +195,7 @@ class Game:
                 pygame.display.update()
                 pygame.time.wait(500)
 
-    def win(self):
+    def win(self):  # check if game is over
         black_stack = 0
         white_stack = 0
 
@@ -170,7 +228,7 @@ class Game:
 
         return False
 
-    def legal(self, pos1, pos2):
+    def legal(self, pos1, pos2):  # check if the move is legal
         if pos1.piece != self.team:
             return False
         if self.base is not None and pos1 != self.base:
@@ -209,9 +267,20 @@ class Game:
         pos1.draw()
         pos2.draw()
         sound.play()
-        print(chr(96+pos1.column)+str(pos1.row)+' '+chr(96+pos2.column)+str(pos2.row))
+        print(chr(96+pos1.column)+str(pos1.row)+' '+chr(96+pos2.column)+str(pos2.row))  # logging
 
-    def game_loop(self):
+    def auto_ender(self):  # if you HAVE to end your move, this function does it for you. else press space
+        for distant in self.tile_list:
+            if (distant.column == self.base.column and abs(distant.row - self.base.row) == 2 or
+            distant.row == self.base.row and abs(distant.column - self.base.column) == 2) and distant.piece == 0 and\
+            distant not in self.visited and distant != self.base:
+                for neighbour in self.tile_list:
+                    if neighbour.row == (self.base.row + distant.row)/2\
+                            and neighbour.column == (self.base.column + distant.column)/2 and neighbour.piece != 0:
+                                return False
+        return True
+
+    def game_loop(self):  # controls and logic
         while self.running:
             pygame.time.delay(FPS)
             for event in pygame.event.get():
@@ -219,9 +288,6 @@ class Game:
                     self.running = False
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and self.base is not None:
                     self.next_turn()
-                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3 and self.turn == 1:
-                    self.run_demo()
-                    self.running = not self.win()
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     pos = pygame.mouse.get_pos()
                     for i in self.tile_list:
@@ -234,11 +300,26 @@ class Game:
                                     self.base = self.move[1]
                                     self.visited.append(self.move[0])
                                     self.move = [self.base]
+                                    if self.auto_ender() is True:
+                                        self.next_turn()
                                 else:
                                     if self.base is None:
                                         self.move.remove(self.move[0])
                                     else:
                                         self.move.remove(self.move[1])
+                        else:
+                            for i in self.menu:
+                                if i.rect.collidepoint(pos):
+                                    if i.text == 'New Game':
+                                        self.reset_board()
+                                    elif i.text == 'Demo':
+                                        self.reset_board()
+                                        self.run_demo()
+                                        self.running = not self.win()
+                                    if i.text == 'Rules':
+                                        pass
+                                    elif i.text == 'About':
+                                        pass
             self.tile_list.update()
             pygame.display.update()
             self.widget()
@@ -248,15 +329,15 @@ class Game:
         second = 'Player: ' + {1: 'White', -1: 'Black'}[self.team]
         third = 'Turn: ' + str(self.turn)
 
-        font = pygame.font.Font(pygame.font.get_default_font(), 30)
         widget_surface = pygame.Surface((0, 0))
-        widget_surface.fill(black)
+        widget_surface.fill(grey)
         i = 0
         for el in [first, second, third]:
-            widget = font.render(el, True, white, black)
+            widget = font.render(el, True, white, grey)
             widgetRect = widget.get_rect()
             widgetRect.center = (1000, 50*(1+i))  #
             screen.blit(widget, widgetRect)
-            i+=1
+            i += 1
+
 
 Game()
