@@ -1,5 +1,6 @@
 import pygame
 
+
 white = (255, 255, 255)
 black = (0, 0, 0)
 
@@ -9,6 +10,8 @@ FPS = 60
 
 pygame.init()
 pygame.mixer.init()
+clock = pygame.time.Clock()
+
 
 w = pygame.image.load('media/w.png')
 b = pygame.image.load('media/b.png')
@@ -25,20 +28,18 @@ pygame.display.set_caption("Corners")
 icon = pygame.image.load('media/checker-board.png')
 pygame.display.set_icon(icon)
 
-clock = pygame.time.Clock()
-
 
 class Tile(pygame.sprite.Sprite):
-    def __init__(self, cl, x, y):
+    def __init__(self, clr, x, y):
         super().__init__()
 
-        self.clr = cl
+        self.clr = clr
         self.column = x
         self.row = y
         self.image = pygame.Surface((100, 100))
         self.rect = self.image.get_rect()
-        self.rect.x = 100 * column
-        self.rect.y = 700-(100 * row)
+        self.rect.x = 100 * (x-1)
+        self.rect.y = 700-(100 * (y-1))
 
         if self.row in range(1, 4) and self.column in range(5, 9):
             self.piece = 1
@@ -68,24 +69,24 @@ class Tile(pygame.sprite.Sprite):
 
         screen.blit(self.image, (self.rect.x, self.rect.y))
 
+
 def swap(pos1, pos2):
     pos1.piece, pos2.piece = pos2.piece, pos1.piece
     pos1.draw()
     pos2.draw()
     sound.play()
+    print(chr(96+pos1.column)+str(pos1.row)+' '+chr(96+pos2.column)+str(pos2.row))
 
 
-
-tile_list = pygame.sprite.Group()
-
-cl = 1
-for row in range(8):
-    cl *= -1
-    for column in range(8):
-        tile = Tile(cl, column+1, row+1)
+def draw_all():
+    cl = 1
+    for row in range(8):
         cl *= -1
-        tile_list.add(tile)
-tile_list.draw(screen)
+        for column in range(8):
+            tile = Tile(cl, column+1, row+1)
+            cl *= -1
+            tile_list.add(tile)
+    tile_list.draw(screen)
 
 
 def redraw():
@@ -162,12 +163,61 @@ def win():
     return False
 
 
+def run_demo():
+    global turn
+    global team
+
+    pair = [None, None]
+    with open('logs/demo.txt') as log:
+        for line in log.readlines()[1:]:
+            if len(line) == 6:
+                x1 = ord(line[0]) - 96
+                y1 = int(line[1])
+                x2 = ord(line[3]) - 96
+                y2 = int(line[4])
+                while pair[0] is None or pair[1] is None:
+                    for tile in tile_list:
+                        if tile.column == x1 and tile.row == y1:
+                            pair[0] = tile
+                        elif tile.column == x2 and tile.row == y2:
+                            pair[1] = tile
+                swap(pair[0], pair[1])
+                pair = [None, None]
+            else:
+                turn += 1
+                team *= -1
+            redraw()
+            pygame.time.wait(500)
+
+
+def next_turn():
+    global turn
+    global team
+    global base
+    global move
+    global visited
+    base = None
+    visited = []
+    move = []
+    turn += 1
+    team *= -1
+    print('Turn #', turn, 'by player', end=' ')
+    if team == 1:
+        print('white')
+    else:
+        print('black')
+
+
+tile_list = pygame.sprite.Group()
+draw_all()
+
 running = True
 team = 1
 move = []
 base = None
 visited = []
 turn = 1
+print('Turn # 1 by player white')
 
 
 while running:
@@ -176,18 +226,10 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and base is not None:
-            base = None
-            visited = []
-            move = []
-            turn += 1
-            team *= -1
-
-            print('Крок', turn, 'гравця ', end='')
-            if team == 1:
-                print('білими')
-            else:
-                print('чорними')
-
+            next_turn()
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3 and turn == 1:
+            run_demo()
+            running = not win()
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             pos = pygame.mouse.get_pos()
             for i in tile_list:
@@ -207,4 +249,3 @@ while running:
                                 move.remove(move[1])
 
     redraw()
-

@@ -1,0 +1,272 @@
+Turn # 1 by player white
+f2 f4
+Turn # 2 by player black
+c7 c5
+Turn # 3 by player white
+f3 f5
+Turn # 4 by player black
+c6 e6
+Turn # 5 by player white
+f4 f6
+Turn # 6 by player black
+e6 g6
+Turn # 7 by player white
+f5 f7
+Turn # 8 by player black
+d7 d5
+d5 b5
+Turn # 9 by player white
+f6 f8
+Turn # 10 by player black
+b5 d5
+Turn # 11 by player white
+e2 e4
+Turn # 12 by player black
+c5 e5
+Turn # 13 by player white
+e4 e6
+e6 c6
+Turn # 14 by player black
+d5 d7
+Turn # 15 by player white
+g2 g4
+Turn # 16 by player black
+d7 d5
+d5 f5
+Turn # 17 by player white
+g3 g5
+g5 g7
+g7 e7
+Turn # 18 by player black
+e5 g5
+g5 g3
+Turn # 19 by player white
+h3 f3
+f3 d3
+Turn # 20 by player black
+b7 b5
+Turn # 21 by player white
+f7 d7
+d7 d5
+Turn # 22 by player black
+d6 d4
+d4 d2
+Turn # 23 by player white
+h1 h3
+h3 f3
+Turn # 24 by player black
+b6 d6
+d6 d4
+Turn # 25 by player white
+d5 d6
+Turn # 26 by player black
+c8 c7
+Turn # 27 by player white
+g4 g5
+Turn # 28 by player black
+c7 c5
+Turn # 29 by player white
+c6 c4
+c4 e4
+Turn # 30 by player black
+d4 f4
+f4 f2
+Turn # 31 by player white
+e3 e5
+Turn # 32 by player black
+g6 g4
+g4 g2
+Turn # 33 by player white
+e4 e6
+e6 c6
+Turn # 34 by player black
+b5 d5
+Turn # 35 by player white
+d6 b6
+Turn # 36 by player black
+a7 a5
+Turn # 37 by player white
+f8 e8
+Turn # 38 by player black
+a6 a4
+Turn # 39 by player white
+e8 c8
+Turn # 40 by player black
+f5 f4
+Turn # 41 by player white
+f3 f5
+Turn # 42 by player black
+d8 d7
+Turn # 43 by player white
+e7 c7
+Turn # 44 by player black
+d7 d6
+Turn # 45 by player white
+c6 a6
+Turn # 46 by player black
+d6 d4
+Turn # 47 by player white
+f1 f3
+Turn # 48 by player black
+f2 f1
+Turn # 49 by player white
+h2 f2
+Turn # 50 by player black
+b8 b7
+Turn # 51 by player white
+b6 b8
+Turn # 52 by player black
+b7 b6
+Turn # 53 by player white
+d3 c3
+Turn # 54 by player black
+g3 e3
+Turn # 55 by player white
+c3 d3
+Turn # 56 by player black
+e3 c3
+Turn # 57 by player white
+d3 b3
+Turn # 58 by player black
+d5 d3
+d3 d1
+Turn # 59 by player white
+e1 c1
+Turn # 60 by player black
+f1 h1
+Turn # 61 by player white
+f5 d5
+d5 b5
+b5 b7
+b7 d7
+Turn # 62 by player black
+g2 e2
+Turn # 63 by player white
+g1 f1
+Turn # 64 by player black
+a8 a7
+Turn # 65 by player white
+a6 a8
+Turn # 66 by player black
+a7 a6
+Turn # 67 by player white
+d7 b7
+Turn # 68 by player black
+a6 c6
+c6 c4
+c4 e4
+e4 g4
+Turn # 69 by player white
+f3 f5
+f5 d5
+d5 b5
+Turn # 70 by player black
+b6 b4
+b4 b2
+Turn # 71 by player white
+f1 f3
+f3 f5
+f5 d5
+Turn # 72 by player black
+e2 g2
+Turn # 73 by player white
+d5 d6
+Turn # 74 by player black
+a5 a3
+Turn # 75 by player white
+f2 e2
+Turn # 76 by player black
+d2 f2
+Turn # 77 by player white
+e2 d2
+Turn # 78 by player black
+f2 h2
+Turn # 79 by player white
+b5 b6
+Turn # 80 by player black
+c3 d3
+Turn # 81 by player white
+d6 c6
+Turn # 82 by player black
+f4 h4
+Turn # 83 by player white
+b3 b4
+Turn # 84 by player black
+a4 c4
+c4 e4
+Turn # 85 by player white
+e5 d5
+Turn # 86 by player black
+c5 e5
+e5 e3
+Turn # 87 by player white
+d5 d6
+Turn # 88 by player black
+e4 e2
+Turn # 89 by player white
+d2 c2
+Turn # 90 by player black
+d3 f3
+Turn # 91 by player white
+c1 c3
+Turn # 92 by player black
+e3 g3
+Turn # 93 by player white
+c2 c4
+Turn # 94 by player black
+g3 g1
+Turn # 95 by player white
+c3 c5
+Turn # 96 by player black
+h4 f4
+f4 f2
+Turn # 97 by player white
+c4 a4
+Turn # 98 by player black
+f3 f1
+Turn # 99 by player white
+a4 a5
+Turn # 100 by player black
+b2 c2
+Turn # 101 by player white
+a5 a6
+Turn # 102 by player black
+d1 e1
+Turn # 103 by player white
+b4 b5
+Turn # 104 by player black
+c2 d2
+Turn # 105 by player white
+b5 a5
+Turn # 106 by player black
+e2 e3
+Turn # 107 by player white
+a5 a7
+Turn # 108 by player black
+d2 e2
+Turn # 109 by player white
+g5 f5
+Turn # 110 by player black
+a3 b3
+Turn # 111 by player white
+f5 e5
+Turn # 112 by player black
+b3 c3
+Turn # 113 by player white
+e5 d5
+Turn # 114 by player black
+c3 d3
+Turn # 115 by player white
+d5 d7
+Turn # 116 by player black
+d3 f3
+Turn # 117 by player white
+d6 d8
+Turn # 118 by player black
+e3 g3
+Turn # 119 by player white
+c5 d5
+Turn # 120 by player black
+d4 d3
+Turn # 121 by player white
+d5 d6
