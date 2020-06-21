@@ -19,14 +19,14 @@ wob = pygame.image.load('media/wob.png')
 bob = pygame.image.load('media/bob.png')
 wow = pygame.image.load('media/wow.png')
 bow = pygame.image.load('media/bow.png')
-# buttons
-bu1 = pygame.image.load('media/button1.png')
-bu2 = pygame.image.load('media/button2.png')
-bu3 = pygame.image.load('media/button3.png')
-bu4 = pygame.image.load('media/button4.png')
 
 sound = pygame.mixer.Sound('media/knock.wav')
 font = pygame.font.Font('consola.ttf', 30)
+small_font = pygame.font.Font('consola.ttf', 15)
+big_font = pygame.font.Font('consola.ttf', 50)
+rules = 'media/rules_rus.txt'
+about = 'media/about.txt'
+
 
 screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 screen.fill(grey)
@@ -80,7 +80,7 @@ class Tile(pygame.sprite.Sprite):
 class Button(pygame.sprite.Sprite):
     global screen_width, screen_height, screen
 
-    def __init__(self, x, y, width, height, text_color, background_color, text):
+    def __init__(self, x, y, width, height, text_color, background_color, text, time=None):
         super().__init__()
 
         self.rect = pygame.Rect(x, y, width, height)
@@ -91,6 +91,7 @@ class Button(pygame.sprite.Sprite):
         self.text = text
         self.text_color = text_color
         self.background_color = background_color
+        self.time = time
 
     @staticmethod
     def drawTextcenter(text, font, screen, x, y, color):
@@ -103,6 +104,15 @@ class Button(pygame.sprite.Sprite):
         self.drawTextcenter(self.text, font, screen, self.x + self.width / 2, self.y + self.height / 2, self.text_color)
         pygame.draw.rect(screen, self.text_color, self.rect, 3)
 
+    def clicked(self, pos, time):
+        if self.rect.collidepoint(pos):
+            if self.time is None:
+                self.time = pygame.time.get_ticks()
+                return True
+            elif time - self.time > 1000:
+                self.time = time
+                return True
+        return False
 
 
 class Game:
@@ -188,8 +198,8 @@ class Game:
                     self.swap(pair[0], pair[1])
                     pair = [None, None]
                 else:
+                    self.team *= 1
                     self.turn += 1
-                    self.team *= -1
 
                 self.tile_list.update()
                 pygame.display.update()
@@ -207,6 +217,7 @@ class Game:
                             white_stack += 1
                         elif self.turn >= 80 and elem.piece == -1:
                             print('White won')
+                            self.congratulate('White')
                             return True
 
             for row2 in range(1, 4):
@@ -216,14 +227,17 @@ class Game:
                             black_stack += 1
                         elif self.turn >= 79 and elem.piece == 1:
                             print('Black won')
+                            self.congratulate('Black')
                             return True
 
         if white_stack == 12:
             print('White won')
+            self.congratulate('White')
             return True
 
         elif black_stack == 12:
             print('Black won')
+            self.congratulate('Black')
             return True
 
         return False
@@ -276,50 +290,56 @@ class Game:
             distant not in self.visited and distant != self.base:
                 for neighbour in self.tile_list:
                     if neighbour.row == (self.base.row + distant.row)/2\
-                            and neighbour.column == (self.base.column + distant.column)/2 and neighbour.piece != 0:
-                                return False
+                    and neighbour.column == (self.base.column + distant.column)/2 and neighbour.piece != 0:
+                        return False
         return True
 
     def game_loop(self):  # controls and logic
-        while self.running:
+        while True:
             pygame.time.delay(FPS)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.running = False
+                    return False
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    self.tile_list.draw(screen)
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and self.base is not None:
                     self.next_turn()
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     pos = pygame.mouse.get_pos()
+                    frame = pygame.time.get_ticks()
                     for i in self.tile_list:
                         if i.rect.collidepoint(pos):
-                            self.move.append(i)
-                            if len(self.move) == 2:
-                                if self.legal(self.move[0], self.move[1]):
-                                    self.swap(self.move[0], self.move[1])
-                                    self.running = not self.win()
-                                    self.base = self.move[1]
-                                    self.visited.append(self.move[0])
-                                    self.move = [self.base]
-                                    if self.auto_ender() is True:
-                                        self.next_turn()
-                                else:
-                                    if self.base is None:
-                                        self.move.remove(self.move[0])
+                            if self.running:
+                                self.move.append(i)
+                                if len(self.move) == 2:
+                                    if self.legal(self.move[0], self.move[1]):
+                                        self.swap(self.move[0], self.move[1])
+                                        self.running = not self.win()
+                                        self.base = self.move[1]
+                                        self.visited.append(self.move[0])
+                                        self.move = [self.base]
+                                        if self.auto_ender() is True and self.running:
+                                            self.next_turn()
                                     else:
-                                        self.move.remove(self.move[1])
+                                        if self.base is None:
+                                            self.move.remove(self.move[0])
+                                        else:
+                                            self.move.remove(self.move[1])
                         else:
                             for i in self.menu:
-                                if i.rect.collidepoint(pos):
+                                if i.clicked(pos, frame):
                                     if i.text == 'New Game':
                                         self.reset_board()
+                                        print('New Game')
                                     elif i.text == 'Demo':
+                                        print('Demo')
                                         self.reset_board()
                                         self.run_demo()
                                         self.running = not self.win()
-                                    if i.text == 'Rules':
-                                        pass
+                                    elif i.text == 'Rules':
+                                        self.print_doc(rules)
                                     elif i.text == 'About':
-                                        pass
+                                        self.print_doc(about)
             self.tile_list.update()
             pygame.display.update()
             self.widget()
@@ -335,9 +355,33 @@ class Game:
         for el in [first, second, third]:
             widget = font.render(el, True, white, grey)
             widgetRect = widget.get_rect()
-            widgetRect.center = (1000, 50*(1+i))  #
+            widgetRect.center = (1000, 50*(1+i))
             screen.blit(widget, widgetRect)
             i += 1
+
+    @staticmethod
+    def print_doc(doc):
+        background = pygame.Surface((800, 1200))
+        background.fill(grey)
+        screen.blit(background, (0, 0))
+        i = 0
+        with open(doc) as rules:
+            for line in rules.readlines():
+                sentence = small_font.render(line.rstrip(), True, white, grey)
+                sentenceRect = sentence.get_rect()
+                sentenceRect.center = (400, 25 * (1 + i))
+                i += 1
+                screen.blit(sentence, sentenceRect)
+
+    @staticmethod
+    def congratulate(clr):
+        background = pygame.Surface((800, 1200))
+        background.fill(grey)
+        screen.blit(background, (0, 0))
+        sentence = big_font.render(clr + ' Wins!', True, white, grey)
+        sentenceRect = sentence.get_rect()
+        sentenceRect.center = (400, 400)
+        screen.blit(sentence, sentenceRect)
 
 
 Game()

@@ -1,0 +1,5 @@
+Year 1 coursework (II.12)
+Гра 'шашки' ('куточки')
+made in Python 3 (Pygame)
+by Andrii Vlasov IP-9105
+for KPI FICT ASOIU 2020
