@@ -167,6 +167,7 @@ class Game:
         self.base = None
         self.visited = []
         self._start_time = pygame.time.get_ticks()
+        self.widget()
 
     def next_turn(self):
         self.base = None
@@ -203,7 +204,7 @@ class Game:
 
                 self.tile_list.update()
                 pygame.display.update()
-                pygame.time.wait(500)
+                pygame.time.wait(0)
 
     def win(self):  # check if game is over
         black_stack = 0
@@ -348,6 +349,10 @@ class Game:
         first = 'Time: ' + str(datetime.timedelta(seconds=(pygame.time.get_ticks() - self._start_time) / 1000))[:7]
         second = 'Player: ' + {1: 'White', -1: 'Black'}[self.team]
         third = 'Turn: ' + str(self.turn)
+
+        background = pygame.Surface((400, 200))
+        background.fill(grey)
+        screen.blit(background, (800, 0))
 
         widget_surface = pygame.Surface((0, 0))
         widget_surface.fill(grey)
